@@ -113,6 +113,12 @@ class JWT
             throw new SignatureInvalidException('Signature verification failed');
         }
 
+        // Check if iat and exp parameters in payload data are string with data, converting them into timestamp
+        if ( isset($payload->iat) && strtotime($payload->iat) !== FALSE )
+            $payload->iat = strtotime($payload->iat);
+        if ( isset($payload->exp) && strtotime($payload->exp) !== FALSE )
+            $payload->exp = strtotime($payload->exp);
+
         // Check the nbf if it is defined. This is the time that the
         // token can actually be used. If it's not yet that time, abort.
         if (isset($payload->nbf) && $payload->nbf > ($timestamp + static::$leeway)) {
@@ -124,14 +130,14 @@ class JWT
         // Check that this token has been created before 'now'. This prevents
         // using tokens that have been created for later use (and haven't
         // correctly used the nbf claim).
-        if (isset($payload->iat) && strtotime($payload->iat) > ($timestamp + static::$leeway)) {
+        if (isset($payload->iat) && $payload->iat > ($timestamp + static::$leeway)) {
             throw new BeforeValidException(
                 'Cannot handle token prior to ' . date(DateTime::ISO8601, $payload->iat)
             );
         }
 
         // Check if this token has expired.
-        if (isset($payload->exp) && ($timestamp - static::$leeway) >= strtotime($payload->exp)) {
+        if (isset($payload->exp) && ($timestamp - static::$leeway) >= $payload->exp) {
             throw new ExpiredException('Expired token');
         }
 
