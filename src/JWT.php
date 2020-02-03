@@ -114,9 +114,9 @@ class JWT
         }
 
         // Check if iat and exp parameters in payload data are string with data, converting them into timestamp
-        if ( isset($payload->iat) && strtotime($payload->iat) !== FALSE )
+        if ( isset($payload->iat) && is_string($payload->iat) && strtotime($payload->iat) !== FALSE )
             $payload->iat = strtotime($payload->iat);
-        if ( isset($payload->exp) && strtotime($payload->exp) !== FALSE )
+        if ( isset($payload->exp) && is_string($payload->exp) && strtotime($payload->exp) !== FALSE )
             $payload->exp = strtotime($payload->exp);
 
         // Check the nbf if it is defined. This is the time that the
